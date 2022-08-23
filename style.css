@@ -1,0 +1,74 @@
+/* @font-face {
+	font-family: "lombok";
+	src: url("../assets/fonts/Lombok/Lombok\ Regular.ttf");
+} */
+
+:root {
+	/* --second-color: #ff4c29; */
+	/* --main-color: #082032; */
+	--action-color: #3dcfff;
+	--main-color: #00171f;
+	--second-color: #003459;
+	--grey: #d2d2d2;
+	--white: #f0eff4;
+}
+
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+	font-family: "League Spartan", sans-serif;
+	font-weight: 400;
+}
+
+body {
+	margin: 0;
+	font-size: 1rem;
+}
+
+button,
+.btn {
+	padding: 0.25rem 0.5rem;
+	background-color: var(--white);
+	color: var(--main-color);
+	border-radius: 3px;
+	border: none;
+	width: fit-content;
+	/* border: 2px transparent solid;*/
+	box-shadow: none;
+	cursor: pointer;
+	font-size: 1rem;
+}
+
+button:hover,
+.btn:hover {
+	background-color: var(--action-color);
+	color: var(--main-color);
+}
+
+button:disabled,
+button[disabled],
+.btn:disabled,
+.btn[disabled] {
+	background-color: #646464;
+	cursor: not-allowed;
+}
+
+input {
+	font-size: 1rem;
+}
+
+.swal2-icon {
+	font-size: 0.75rem !important;
+}
+.swal2-title {
+	font-size: 1.5rem !important;
+}
+.swal2-loader {
+	border-color: var(--action-color) transparent var(--action-color) transparent !important;
+}
+
+.title {
+	margin-top: 0;
+	color: var(--action-color);
+}
