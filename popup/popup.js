@@ -144,6 +144,20 @@ async function init() {
 		}
 	});
 
+	document.querySelector("#print").addEventListener("click", () => {
+		if (connected) {
+			let name = creatorInput.value;
+			if (!creatorSwitch.checked) name = null;
+
+			showLoadingSwal();
+
+			port.postMessage({
+				call: "print",
+				creator: name,
+			});
+		}
+	});
+
 	function sendView(id) {
 		if (connected) {
 			if (id == "hide") {

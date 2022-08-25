@@ -69,6 +69,11 @@ chrome.runtime.onConnect.addListener(function (port) {
 					if (req.toggle == "show") toggleVideos(true);
 					else if (req.toggle == "hide") toggleVideos(false);
 					break;
+				case "print":
+					if (req.creator) console.log(videoByCreator);
+					else console.log(videoData);
+					console.log("--------------------------");
+					break;
 				default:
 					console.log("Action invalide reçue");
 					break;
