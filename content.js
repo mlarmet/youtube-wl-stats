@@ -47,7 +47,10 @@ chrome.runtime.onConnect.addListener(function (port) {
 					break;
 				case "videoNumber":
 					if (req.creator) videoCount(videoByCreator);
-					else videoCount(videoData);
+					else {
+						videoCount(videoData);
+						countCreatorOccurrences(videoData);
+					}
 					break;
 				case "creator":
 					findByName(req.creator);
@@ -95,7 +98,7 @@ window.addEventListener("load", () => {
 });
 
 function processVideo() {
-	// console.clear();
+	console.clear();
 	console.log("--------------------------\n\n\nYoutube WL Stats\n\n\n--------------------------");
 
 	clearCssTag();
@@ -115,11 +118,17 @@ function processVideo() {
 		const videoCreator = video.querySelector("ytd-channel-name a");
 		const videoTime = video.querySelector("ytd-thumbnail-overlay-time-status-renderer span#text");
 		const videoProgress = video.querySelector("div#progress");
+		const videoArriaLabel = video.querySelector("div#meta h3");
 
 		let idx = parseInt(videoTitle.href.split("&")[2].replace("index=", ""));
 		let titre = videoTitle.innerText;
 		let youtuber = videoCreator.innerText;
 		let time = videoTime?.innerText.trim().replace(",", ":");
+
+		let label = removeAccents(videoArriaLabel.getAttribute("aria-label"));
+		let motif = " de " + removeAccents(youtuber) + " il y a ";
+
+		let release = label.slice(label.indexOf(motif) + motif.length);
 
 		let watched = false,
 			ended = false;
@@ -138,7 +147,7 @@ function processVideo() {
 			time = "0:" + time;
 		}
 
-		let data = { duration: time, creator: youtuber, title: titre, sortie: null, index: idx, state: { watch: watched, end: ended }, element: video };
+		let data = { duration: time, creator: youtuber, title: titre, sortie: release, index: idx, state: { watch: watched, end: ended }, element: video };
 		videoData.push(data);
 
 		return true;
@@ -156,7 +165,7 @@ function processVideo() {
 
 //=======NUMBER VIDEO=========
 function videoCount(videoArray = null) {
-	console.log("--------------------------");
+	//console.log("--------------------------");
 	console.log(`Il y ${numberOfVideos} video${numberOfVideos > 1 ? "s" : ""} en tout.`);
 	console.log(`Le programme a traite ${videoData.length} video${numberOfVideos > 1 ? "s" : ""}.`);
 	if (videoArray) console.log(`La liste contient ${videoArray.length} video${videoArray.length > 1 ? "s" : ""}.`);
@@ -166,7 +175,7 @@ function videoCount(videoArray = null) {
 
 //=======TIME STATE===========
 function globalTime(videoArray = []) {
-	console.log("--------------------------");
+	//console.log("--------------------------");
 	if (videoArray.length === 0) {
 		console.log(`Erreur : la liste ne contient aucune video`);
 	} else {
@@ -190,7 +199,7 @@ function globalTime(videoArray = []) {
 //=======CREATOR VIDEO========
 let videoByCreator = [];
 function findByName(creatorName, watchState = false) {
-	console.log("--------------------------");
+	//console.log("--------------------------");
 	if (!creatorName.trim()) {
 		console.log("Erreur : aucun nom de createur n'a ete donne !");
 	} else {
@@ -216,7 +225,7 @@ function findByName(creatorName, watchState = false) {
 
 //=======VIDEO ARRAY STAT=====
 function showVideoArrayStat(videoArray = [], watchState = false) {
-	console.log("--------------------------");
+	//console.log("--------------------------");
 	if (videoArray.length === 0) {
 		console.log(`Erreur : la liste ne contient aucune video`);
 	} else {
@@ -237,8 +246,8 @@ function showVideoArrayStat(videoArray = [], watchState = false) {
 			video.element.querySelector("div#index-container")?.classList.add(`${cssTag}`);
 
 			console.log(`La video la plus ${tag} dans la liste dure ${h.padStart(2, "0")}:${m.padStart(2, "0")}:${s.padStart(2, "0")}`);
-			console.log(`-> "${video.title}" (n° ${video.index})`);
-			console.log(`-> De "${video.creator}" sortie le ${video.sortie}`);
+			console.log(`\t- "${video.title}" (n° ${video.index})`);
+			console.log(`\t- De "${video.creator}" sortie le ${video.sortie}`);
 
 			if (watchState) console.log(`Elle ${video.state.watch ? "a" : "n'a pas"} été vu ${video.state.end ? "" : "mais pas "}jusqu'a la fin.`);
 		}
@@ -249,7 +258,7 @@ function showVideoArrayStat(videoArray = [], watchState = false) {
 
 //=======CLEAR CSS TAG========
 function clearCssTag() {
-	console.log("--------------------------");
+	//console.log("--------------------------");
 	clearShortTag();
 	clearLongTag();
 	clearCreatorTag();
@@ -298,6 +307,29 @@ function toggleVideos(visibility) {
 	});
 
 	chrome.storage.local.set({ visibility: visibility });
+}
+//============================
+
+//=======COUNT OCCURRENCES====
+function countCreatorOccurrences(videoArray = []) {
+	//console.log("--------------------------");
+	if (videoArray.length == 0) {
+		console.log(`Erreur : la liste ne contient aucune video`);
+	} else {
+		let creatorIndexArray = videoArray.reduce((acc, curr) => (acc[curr.creator] ? ++acc[curr.creator] : (acc[curr.creator] = 1), acc), []);
+
+		let occurrences = Object.keys(creatorIndexArray).map((key) => ({ creator: key, count: creatorIndexArray[key] }));
+		occurrences.sort((a, b) => b.count - a.count);
+
+		console.log(`Cette liste contient ${occurrences.length} createur${occurrences.length > 1 ? "s" : ""} different${occurrences.length > 1 ? "s" : ""}`);
+		console.log(occurrences);
+		console.log(`Le createur le plus présent dans cette liste est "${occurrences[0].creator}" avec ${occurrences[0].count} video${occurrences[0].count > 1 ? "s" : ""}`);
+		console.log(`Cela represente :`);
+		console.log(`\t- ${((occurrences[0].count / videoArray.length) * 100).toFixed(2)}% de cette liste`);
+		//console.log(`\t- ${((occurrences[0].count / videoData.length) * 100).toFixed(2)}% de la liste global`);
+		console.log(`\t- ${((occurrences[0].count / numberOfVideos) * 100).toFixed(2)}% du nombre total de video`);
+	}
+	console.log("--------------------------");
 }
 //============================
 
