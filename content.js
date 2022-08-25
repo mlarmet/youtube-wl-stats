@@ -165,9 +165,9 @@ function videoCount(videoArray = null) {
 //============================
 
 //=======TIME STATE===========
-function globalTime(videoArray) {
+function globalTime(videoArray = []) {
 	console.log("--------------------------");
-	if (!videoArray || videoArray.length == 0) {
+	if (videoArray.length === 0) {
 		console.log(`Erreur : la liste ne contient aucune video`);
 	} else {
 		let totalTime = 0;
@@ -215,9 +215,9 @@ function findByName(creatorName, watchState = false) {
 //============================
 
 //=======VIDEO ARRAY STAT=====
-function showVideoArrayStat(videoArray, watchState = false) {
+function showVideoArrayStat(videoArray = [], watchState = false) {
 	console.log("--------------------------");
-	if (videoArray.length == 0) {
+	if (videoArray.length === 0) {
 		console.log(`Erreur : la liste ne contient aucune video`);
 	} else {
 		for (let i = 0; i < 2; i++) {
