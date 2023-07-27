@@ -64,7 +64,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 					if (req.creator) globalTime(videoByCreator);
 					else globalTime(videoData);
 					break;
-				case "videoNumber":
+				case "videosNumber":
 					if (req.creator) videoCount(videoByCreator);
 					else {
 						videoCount(videoData);
@@ -85,8 +85,8 @@ chrome.runtime.onConnect.addListener(function (port) {
 					toggleVideos(true);
 					break;
 				case "view":
-					if (req.toggle == "show") toggleVideos(true);
-					else if (req.toggle == "hide") toggleVideos(false);
+					const visibility = req.toggle === "show";
+					toggleVideos(visibility);
 					break;
 				case "print":
 					const array = req.creator ? videoByCreator : videoData;
@@ -95,6 +95,9 @@ chrome.runtime.onConnect.addListener(function (port) {
 					console.log(array);
 					console.log(sortedArray);
 					console.log("--------------------------");
+					break;
+				case "sortElements":
+					sortElementsByTime(videoData, req.method);
 					break;
 				default:
 					console.log("Action invalide reçue");
@@ -136,9 +139,9 @@ function processVideo() {
 
 	//numberOfVideos = parseInt(document.querySelector("div#stats yt-formatted-string span").innerText);
 
-	const videoContainer = document.querySelectorAll("ytd-playlist-video-renderer");
+	const videoElements = document.querySelectorAll("ytd-playlist-video-renderer");
 
-	Array.from(videoContainer).every((video) => {
+	Array.from(videoElements).every((video) => {
 		const videoTitle = video.querySelector("div#meta a#video-title");
 		const videoCreator = video.querySelector("ytd-channel-name a");
 		const videoTime = video.querySelector("ytd-thumbnail-overlay-time-status-renderer span#text");
@@ -363,6 +366,34 @@ function countCreatorOccurrences(videoArray = []) {
 		console.log(`\t- ${((occurrences[0].count / videoArray.length) * 100).toFixed(2)}% de cette liste`);
 		//console.log(`\t- ${((occurrences[0].count / videoData.length) * 100).toFixed(2)}% de la liste global`);
 		console.log(`\t- ${((occurrences[0].count / numberOfVideos) * 100).toFixed(2)}% du nombre total de video`);
+	}
+	console.log("--------------------------");
+}
+//============================
+
+//=======SORT ELEMENTS========
+function sortElementsByTime(videoArray = [], method = "increase") {
+	//console.log("--------------------------");
+	if (videoArray.length === 0) {
+		console.log(`Erreur : la liste ne contient aucune video`);
+	} else {
+		chrome.storage.local.set({ sortMethod: method });
+
+		const sortedVideoArray = videoArray.toSorted(sortTime);
+
+		const videoContainer = sortedVideoArray[0].element.parentNode;
+
+		if (method === "increase") {
+			// reverse if increase cause prepend (last video in array will be first in page)
+			sortedVideoArray.reverse();
+		}
+
+		sortedVideoArray.forEach((video) => {
+			videoContainer.removeChild(video.element);
+			videoContainer.prepend(video.element);
+		});
+
+		console.log(`La liste a été triée par durée de facon ${method === "decrease" ? "décroissante" : "croissante"}.`);
 	}
 	console.log("--------------------------");
 }

@@ -138,6 +138,20 @@ a {
 	margin: 0.5rem;
 }
 
+#sort-videos {
+	min-width: max-content;
+}
+
+#sort-videos-arrow {
+	margin-left: 0.5rem;
+}
+
+#sort-videos-arrow svg {
+	height: 15px;
+	vertical-align: middle;
+	display: none;
+}
+
 #creator {
 	width: 100%;
 	/* margin-top: 1rem; */
@@ -152,6 +166,7 @@ a {
 	justify-content: space-between;
 	align-items: center;
 }
+
 #creator-title p {
 	margin: 0;
 }
