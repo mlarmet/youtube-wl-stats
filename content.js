@@ -31,6 +31,27 @@ chrome.runtime.onConnect.addListener(function (port) {
 					processVideo();
 					port.postMessage({ from: "load" });
 					break;
+				case "loadAll":
+					const resizeObserver = new ResizeObserver((entries) => {
+						window.scrollTo(0, document.querySelector("ytd-app").clientHeight);
+
+						//if all video in playlist are show
+						if (numberOfVideos == document.querySelectorAll("ytd-playlist-video-renderer").length) {
+							resizeObserver.disconnect();
+
+							window.scrollTo(0, 0);
+
+							processVideo();
+
+							port.postMessage({ from: "loadAll" });
+							port.postMessage({ from: "swal" });
+
+							return;
+						}
+					});
+
+					resizeObserver.observe(document.querySelector("ytd-app"));
+					break;
 				case "minmax":
 					if (req.creator) showVideoArrayStat(videoByCreator);
 					else showVideoArrayStat(videoData);
@@ -70,8 +91,11 @@ chrome.runtime.onConnect.addListener(function (port) {
 					else if (req.toggle == "hide") toggleVideos(false);
 					break;
 				case "print":
-					if (req.creator) console.log(videoByCreator);
-					else console.log(videoData);
+					let array = req.creator ? videoByCreator : videoData;
+					let sortedArray = sortedArray.toSorted(sortTime);
+
+					console.log(array);
+					console.log(sortedArray);
 					console.log("--------------------------");
 					break;
 				default:
@@ -79,18 +103,19 @@ chrome.runtime.onConnect.addListener(function (port) {
 					break;
 			}
 
-			port.postMessage({ from: "swal" });
+			if (req.call != "loadAll") port.postMessage({ from: "swal" });
 		}
 	});
 });
 
 window.addEventListener("load", () => {
 	const mutationObserver = new MutationObserver(() => {
-		const span = document.querySelector("div#stats yt-formatted-string span");
+		const span = document.querySelector(".metadata-stats span");
+		//document.querySelector("div#stats yt-formatted-string span");
 
 		if (span) {
 			setTimeout(() => {
-				processVideo();
+				numberOfVideos = parseInt(span.innerText);
 			}, 500);
 
 			// showVideoArrayStat(videoData);
@@ -111,7 +136,7 @@ function processVideo() {
 
 	videoData = [];
 
-	numberOfVideos = parseInt(document.querySelector("div#stats yt-formatted-string span").innerText);
+	//numberOfVideos = parseInt(document.querySelector("div#stats yt-formatted-string span").innerText);
 
 	const videoContainer = document.querySelectorAll("ytd-playlist-video-renderer");
 
@@ -195,7 +220,12 @@ function globalTime(videoArray = []) {
 		}
 
 		console.log(`Le temps moyen d'une video de la liste est de ${(totalTime / videoArray.length).toFixed(2)} minutes.`);
-		console.log(`Le temps total de la liste est de ${totalTime.toFixed(2)} minutes soit ${(totalTime / 60).toFixed(2)} heures soit ${(totalTime / (60 * 24)).toFixed(2)} jours.`);
+		console.log(
+			`Le temps total de la liste est de ${totalTime.toFixed(2)} minutes soit ${(totalTime / 60).toFixed(2)} heures soit ${(
+				totalTime /
+				(60 * 24)
+			).toFixed(2)} jours.`
+		);
 	}
 	console.log("--------------------------");
 }
@@ -213,6 +243,7 @@ function findByName(creatorName, watchState = false) {
 		videoByCreator = videoData.filter((video) => creatorName.toLowerCase().localeCompare(video.creator.toLowerCase()) == 0);
 
 		console.log(videoByCreator);
+		//s at end video
 		if (videoByCreator.length > 1) console.log(`Il y a ${videoByCreator.length} videos qui ont ete trouvees dans cette liste`);
 		else console.log(`Il y a ${videoByCreator.length} video qui a ete trouvee dans cette liste`);
 
@@ -298,7 +329,9 @@ function toggleVideos(visibility) {
 			let index = video.querySelector("div#index-container");
 			let indexClass = index.classList;
 
-			let noTag = Array.from(indexClass).every((aClass) => aClass.indexOf("courte-") == -1 && aClass.indexOf("longue-") == -1 && aClass.indexOf("creator-") == -1);
+			let noTag = Array.from(indexClass).every(
+				(aClass) => aClass.indexOf("courte-") == -1 && aClass.indexOf("longue-") == -1 && aClass.indexOf("creator-") == -1
+			);
 
 			// video.style.display = noTag ? "none" : "";
 
@@ -328,7 +361,11 @@ function countCreatorOccurrences(videoArray = []) {
 
 		console.log(`Cette liste contient ${occurrences.length} createur${occurrences.length > 1 ? "s" : ""} different${occurrences.length > 1 ? "s" : ""}`);
 		console.log(occurrences);
-		console.log(`Le createur le plus présent dans cette liste est "${occurrences[0].creator}" avec ${occurrences[0].count} video${occurrences[0].count > 1 ? "s" : ""}`);
+		console.log(
+			`Le createur le plus présent dans cette liste est "${occurrences[0].creator}" avec ${occurrences[0].count} video${
+				occurrences[0].count > 1 ? "s" : ""
+			}`
+		);
 		console.log(`Cela represente :`);
 		console.log(`\t- ${((occurrences[0].count / videoArray.length) * 100).toFixed(2)}% de cette liste`);
 		//console.log(`\t- ${((occurrences[0].count / videoData.length) * 100).toFixed(2)}% de la liste global`);
