@@ -1,4 +1,5 @@
 const displayer = document.querySelector("#display-info");
+const playlistLink = document.querySelector("#playlist-link");
 const actions = document.querySelector("#actions");
 const data = document.querySelector("#data");
 const creatorInput = document.querySelector("#creator-input");
@@ -11,15 +12,23 @@ function setDisplayText(text) {
 	displayer.textContent = text;
 }
 function showVideoLoad() {
-	// setDisplayText("Chargement...");
+	setDisplayText("Chargement...");
 
 	chrome.storage.local.get(["data"], function (result) {
 		if (result?.data?.load) {
 			setDisplayText(result.data.display);
 			data.style.display = "";
 		} else {
-			setDisplayText("Erreur lors de la récupération");
 			data.style.display = "none";
+
+			port.postMessage({
+				call: "loadAll",
+			});
+
+			showLoadingSwal();
+
+			// setDisplayText("Erreur lors de la récupération");
+			// data.style.display = "none";
 		}
 	});
 
@@ -50,7 +59,7 @@ function showLoadingSwal() {
 		showConfirmButton: false,
 		allowEscapeKey: false,
 		allowOutsideClick: false,
-		// timer: 2000,
+		timer: 20000, //secure if load all failed
 		didOpen: () => {
 			Swal.showLoading();
 		},
@@ -69,8 +78,9 @@ document.querySelector("#option").addEventListener("click", function () {
 });
 
 async function init() {
-	let connected = true;
 	let port = null;
+	let connected = true;
+	playlistLink.style.display = "none";
 
 	//====================== PORT =======================
 	let queryOptions = { url: "https://www.youtube.com/playlist?list=WL" };
@@ -79,9 +89,10 @@ async function init() {
 	//not tab found
 	if (tabs.length == 0) {
 		setDisplayText("Aucun onglet valide ouvert");
-
+		playlistLink.style.display = "block";
 		data.style.display = "none";
 		connected = false;
+		Swal.close();
 		return;
 	}
 	port = chrome.tabs.connect(tabs[0].id, { name: "mlarmet" });
@@ -93,16 +104,21 @@ async function init() {
 		if (chrome.runtime.lastError) {
 			console.log("runtime error", chrome.runtime.lastError);
 			setDisplayText("Connexion impossible");
+			Swal.close();
 		}
 	});
 
 	if (!connected) {
+		Swal.close();
 		return;
 	}
 
 	port.onMessage.addListener(function (response) {
 		switch (response.from) {
 			case "load":
+				showVideoLoad();
+				break;
+			case "loadAll":
 				showVideoLoad();
 				break;
 			case "swal":
@@ -125,8 +141,6 @@ async function init() {
 			port.postMessage({
 				call: "load",
 			});
-
-			//no send view cause load in content toggle it
 		} else init();
 	});
 
@@ -158,14 +172,33 @@ async function init() {
 		}
 	});
 
+	function showVideoLoad() {
+		chrome.storage.local.get(["data"], function (result) {
+			if (result?.data?.load) {
+				setDisplayText(result.data.display);
+				data.style.display = "";
+			} else {
+				data.style.display = "none";
+				//setDisplayText("Chargement...");
+
+				showLoadingSwal();
+
+				port.postMessage({
+					call: "loadAll",
+				});
+
+				// setDisplayText("Erreur lors de la récupération");
+				// data.style.display = "none";
+			}
+		});
+	}
+
 	function sendView(id) {
 		if (connected) {
 			if (id == "hide") {
-				console.log("hide button");
 				hideButton.style.display = "none";
 				showButton.style.display = "block";
 			} else if (id == "show") {
-				console.log("show button");
 				hideButton.style.display = "block";
 				showButton.style.display = "none";
 			} else {
