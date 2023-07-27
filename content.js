@@ -1,9 +1,7 @@
 let numberOfVideos = -1;
-// parseInt(document.querySelector("div#stats yt-formatted-string span")?.innerText);
 
 let videoData = [];
-
-const nowDate = new Date();
+let videoByCreator = [];
 
 chrome.storage.local.clear();
 
@@ -91,8 +89,8 @@ chrome.runtime.onConnect.addListener(function (port) {
 					else if (req.toggle == "hide") toggleVideos(false);
 					break;
 				case "print":
-					let array = req.creator ? videoByCreator : videoData;
-					let sortedArray = sortedArray.toSorted(sortTime);
+					const array = req.creator ? videoByCreator : videoData;
+					const sortedArray = videoArray.toSorted(sortTime);
 
 					console.log(array);
 					console.log(sortedArray);
@@ -141,9 +139,6 @@ function processVideo() {
 	const videoContainer = document.querySelectorAll("ytd-playlist-video-renderer");
 
 	Array.from(videoContainer).every((video) => {
-		//if same time, new Date() give different miliseconds
-		//let date = new Date();
-
 		const videoTitle = video.querySelector("div#meta a#video-title");
 		const videoCreator = video.querySelector("ytd-channel-name a");
 		const videoTime = video.querySelector("ytd-thumbnail-overlay-time-status-renderer span#text");
@@ -172,23 +167,24 @@ function processVideo() {
 			return false;
 		}
 
+		// XX:XX = < 1 hour
 		if (time.split(":").length < 3) {
-			//<1h
+			// Transform to X:XX:XX
 			time = "0:" + time;
 		}
 
-		let data = { duration: time, creator: youtuber, title: titre, sortie: release, index: idx, state: { watch: watched, end: ended }, element: video };
+		const data = { duration: time, creator: youtuber, title: titre, sortie: release, index: idx, state: { watch: watched, end: ended }, element: video };
 		videoData.push(data);
 
 		return true;
 	});
 
+	const suffix = videoData.length > 1 ? "s" : "";
+
 	chrome.storage.local.set({
 		data: {
 			load: true,
-			display: `${videoData.length} vidéo${videoData.length > 1 ? "s" : ""} 
-			chargée${videoData.length > 1 ? "s" : ""} 
-			sur ${numberOfVideos}`,
+			display: `${videoData.length} vidéo${suffix} chargée${suffix} sur ${numberOfVideos}`,
 		},
 	});
 }
@@ -232,7 +228,6 @@ function globalTime(videoArray = []) {
 //============================
 
 //=======CREATOR VIDEO========
-let videoByCreator = [];
 function findByName(creatorName, watchState = false) {
 	//console.log("--------------------------");
 	if (!creatorName.trim()) {
@@ -265,19 +260,16 @@ function showVideoArrayStat(videoArray = [], watchState = false) {
 	if (videoArray.length === 0) {
 		console.log(`Erreur : la liste ne contient aucune video`);
 	} else {
+		const sortedVideoArray = videoArray.toSorted(sortTime);
+
 		for (let i = 0; i < 2; i++) {
-			//sort the new array
-			let sortedVideoArray = [];
-			Object.assign(sortedVideoArray, videoArray);
-			sortedVideoArray.sort(sortTime);
+			const video = sortedVideoArray[i == 0 ? 0 : videoArray.length - 1];
+			const [h, m, s] = video.duration.split(":");
 
-			let video = sortedVideoArray[i == 0 ? 0 : videoArray.length - 1];
-			let [h, m, s] = video.duration.split(":");
-
-			let tag = i == 0 ? "courte" : "longue";
+			const tag = i == 0 ? "courte" : "longue";
 
 			//if array is the global array
-			let cssTag = tag + (videoArray.length === videoData.length ? "-video" : "-creator-video");
+			const cssTag = tag + (videoArray.length === videoData.length ? "-video" : "-creator-video");
 
 			video.element.querySelector("div#index-container")?.classList.add(`${cssTag}`);
 
@@ -301,12 +293,15 @@ function clearCssTag() {
 	console.log("Les tags CSS ont été éffacés.");
 	console.log("--------------------------");
 }
+
 function clearShortTag() {
 	document.querySelectorAll(".courte-video").forEach((video) => video.classList.remove("courte-video"));
 }
+
 function clearLongTag() {
 	document.querySelectorAll(".longue-video").forEach((video) => video.classList.remove("longue-video"));
 }
+
 function clearCreatorTag() {
 	document.querySelectorAll(".creator-video").forEach((video) => {
 		video.classList.remove("creator-video");
@@ -326,21 +321,19 @@ function toggleVideos(visibility) {
 			video.style.display = "";
 		} else {
 			//hide
-			let index = video.querySelector("div#index-container");
-			let indexClass = index.classList;
+			const index = video.querySelector("div#index-container");
+			const indexClass = index.classList;
 
-			let noTag = Array.from(indexClass).every(
-				(aClass) => aClass.indexOf("courte-") == -1 && aClass.indexOf("longue-") == -1 && aClass.indexOf("creator-") == -1
-			);
+			const noTag = true;
 
-			// video.style.display = noTag ? "none" : "";
-
-			if (noTag) {
-				video.style.display = "none";
-			} else {
-				//reset display if tag add after hide
-				video.style.display = "";
+			for (let aClass of indexClass) {
+				if (aClass.indexOf("courte-") != -1 || aClass.indexOf("longue-") != -1 || aClass.indexOf("creator-") != -1) {
+					noTag = false;
+					break;
+				}
 			}
+
+			video.style.display = noTag ? "none" : "";
 		}
 	});
 
@@ -354,9 +347,9 @@ function countCreatorOccurrences(videoArray = []) {
 	if (videoArray.length == 0) {
 		console.log(`Erreur : la liste ne contient aucune video`);
 	} else {
-		let creatorIndexArray = videoArray.reduce((acc, curr) => (acc[curr.creator] ? ++acc[curr.creator] : (acc[curr.creator] = 1), acc), []);
+		const creatorIndexArray = videoArray.reduce((acc, curr) => (acc[curr.creator] ? ++acc[curr.creator] : (acc[curr.creator] = 1), acc), []);
 
-		let occurrences = Object.keys(creatorIndexArray).map((key) => ({ creator: key, count: creatorIndexArray[key] }));
+		const occurrences = Object.keys(creatorIndexArray).map((key) => ({ creator: key, count: creatorIndexArray[key] }));
 		occurrences.sort((a, b) => b.count - a.count);
 
 		console.log(`Cette liste contient ${occurrences.length} createur${occurrences.length > 1 ? "s" : ""} different${occurrences.length > 1 ? "s" : ""}`);

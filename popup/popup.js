@@ -131,45 +131,51 @@ async function init() {
 	});
 
 	document.querySelector("#load").addEventListener("click", () => {
-		if (connected) {
-			creatorSwitch.checked = false;
-			hideButton.style.display = "block";
-			showButton.style.display = "none";
+		if (!connected) {
+			init();
+			return;
+		}
 
-			showLoadingSwal();
+		creatorSwitch.checked = false;
+		hideButton.style.display = "block";
+		showButton.style.display = "none";
 
-			port.postMessage({
-				call: "load",
-			});
-		} else init();
+		showLoadingSwal();
+
+		port.postMessage({
+			call: "load",
+		});
 	});
 
 	document.querySelector("#clear").addEventListener("click", () => {
-		if (connected) {
-			creatorSwitch.checked = false;
-			hideButton.style.display = "block";
-			showButton.style.display = "none";
-
-			showLoadingSwal();
-
-			port.postMessage({
-				call: "clear",
-			});
+		if (!connected) {
+			return;
 		}
+
+		creatorSwitch.checked = false;
+		hideButton.style.display = "block";
+		showButton.style.display = "none";
+
+		showLoadingSwal();
+
+		port.postMessage({
+			call: "clear",
+		});
 	});
 
 	document.querySelector("#print").addEventListener("click", () => {
-		if (connected) {
-			let name = creatorInput.value;
-			if (!creatorSwitch.checked) name = null;
-
-			showLoadingSwal();
-
-			port.postMessage({
-				call: "print",
-				creator: name,
-			});
+		if (!connected) {
+			return;
 		}
+
+		const name = creatorSwitch.checked ? creatorInput.value : null;
+
+		showLoadingSwal();
+
+		port.postMessage({
+			call: "print",
+			creator: name,
+		});
 	});
 
 	function showVideoLoad() {
@@ -194,24 +200,26 @@ async function init() {
 	}
 
 	function sendView(id) {
-		if (connected) {
-			if (id == "hide") {
-				hideButton.style.display = "none";
-				showButton.style.display = "block";
-			} else if (id == "show") {
-				hideButton.style.display = "block";
-				showButton.style.display = "none";
-			} else {
-				return;
-			}
-
-			showLoadingSwal();
-
-			port.postMessage({
-				call: "view",
-				toggle: id,
-			});
+		if (!connected) {
+			return;
 		}
+
+		if (id == "hide") {
+			hideButton.style.display = "none";
+			showButton.style.display = "block";
+		} else if (id == "show") {
+			hideButton.style.display = "block";
+			showButton.style.display = "none";
+		} else {
+			return;
+		}
+
+		showLoadingSwal();
+
+		port.postMessage({
+			call: "view",
+			toggle: id,
+		});
 	}
 
 	hideButton.addEventListener("click", () => {
@@ -239,35 +247,36 @@ async function init() {
 	});
 
 	creatorSwitch.addEventListener("change", (e) => {
-		if (!creatorSwitch.checked) return;
-
-		if (connected) {
-			let name = creatorInput.value;
-
-			showLoadingSwal();
-
-			port.postMessage({
-				call: "creator",
-				creator: name,
-			});
+		if (!creatorSwitch.checked || !connected) {
+			return;
 		}
+
+		const name = creatorInput.value;
+
+		showLoadingSwal();
+
+		port.postMessage({
+			call: "creator",
+			creator: name,
+		});
 	});
 
 	actions.querySelectorAll("button").forEach((button) => {
 		button.addEventListener("click", (e) => {
-			if (connected) {
-				let action = button.getAttribute("data-action");
-
-				let name = creatorInput.value;
-				if (!creatorSwitch.checked) name = null;
-
-				showLoadingSwal();
-
-				port.postMessage({
-					call: action,
-					creator: name,
-				});
+			if (!connected) {
+				return;
 			}
+
+			const action = button.getAttribute("data-action");
+
+			const name = creatorSwitch.checked ? creatorInput.value : null;
+
+			showLoadingSwal();
+
+			port.postMessage({
+				call: action,
+				creator: name,
+			});
 		});
 	});
 
