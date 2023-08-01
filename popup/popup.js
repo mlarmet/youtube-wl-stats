@@ -13,6 +13,79 @@ const arrowIncrease = document.querySelector("#arrow-increase");
 const creatorInput = document.querySelector("#creator-input");
 const creatorSwitch = document.querySelector("#creator-select");
 
+const creatorSuggestions = document.getElementById("creator-suggestions");
+
+let creatorList = [];
+
+creatorInput.addEventListener("input", (e) => {
+	const nameContent = creatorInput.value;
+
+	filterSuggestions(nameContent);
+});
+
+function filterSuggestions(nameValue) {
+	const matchNameList = [];
+
+	if (nameValue.trim() !== "") {
+		for (let name of creatorList) {
+			if (name.toLowerCase().includes(nameValue.toLowerCase())) {
+				matchNameList.push(name);
+			}
+		}
+	}
+
+	showSuggestions(matchNameList);
+}
+
+function showSuggestions(matchNameList) {
+	creatorSuggestions.querySelectorAll("li").forEach((name) => {
+		name.style.display = "none";
+	});
+
+	creatorSuggestions.style.borderWidth = matchNameList.length >= 1 ? "2px" : "0";
+	creatorSuggestions.style.marginTop = matchNameList.length >= 1 ? "0.5em" : "0";
+	creatorSuggestions.style.overflowY = matchNameList.length >= 4 ? "scroll" : "hidden";
+
+	for (let name of matchNameList) {
+		const li = creatorSuggestions.querySelector("#" + name.replace(/ /g, "-"));
+		if (li) {
+			li.style.display = "block";
+		}
+	}
+}
+
+function setCreatorList(list) {
+	creatorSuggestions.style.borderWidth = "0";
+	creatorSuggestions.style.marginTop = "0";
+	creatorSuggestions.style.overflowY = "hidden";
+
+	creatorList = list;
+
+	for (let name of creatorList) {
+		let liElem = document.createElement("li");
+		liElem.textContent = name;
+		liElem.id = name.replace(/ /g, "-");
+		liElem.style.display = "none";
+
+		liElem.addEventListener("click", (e) => {
+			setCreator(name);
+		});
+
+		creatorSuggestions.appendChild(liElem);
+	}
+}
+
+function setCreator(name) {
+	creatorInput.value = name;
+
+	creatorSuggestions.querySelectorAll("li").forEach((name) => {
+		name.style.display = "none";
+	});
+
+	creatorSuggestions.style.borderWidth = "0";
+	creatorSuggestions.style.marginTop = "0";
+}
+
 function setDisplayText(text) {
 	if (!text?.trim()) return;
 	displayer.textContent = text;
@@ -59,6 +132,10 @@ function showVideoLoad() {
 		if (result?.data?.load) {
 			setDisplayText(result.data.display);
 			data.style.display = "";
+
+			port?.postMessage({
+				call: "creatorList",
+			});
 		} else {
 			data.style.display = "none";
 			//setDisplayText("Chargement...");
@@ -149,6 +226,9 @@ async function init() {
 				break;
 			case "swal":
 				Swal.close();
+				break;
+			case "creatorList":
+				setCreatorList(response.creatorList || []);
 				break;
 			default:
 				console.log("default response pb", response);

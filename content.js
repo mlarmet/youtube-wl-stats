@@ -99,12 +99,15 @@ chrome.runtime.onConnect.addListener(function (port) {
 				case "sortElements":
 					sortElementsByTime(videoData, req.method);
 					break;
+				case "creatorList":
+					port.postMessage({ from: "creatorList", creatorList: getCreatorsList(videoData) });
+					return;
 				default:
 					console.log("Action invalide reçue");
 					break;
 			}
 
-			if (req.call != "loadAll") port.postMessage({ from: "swal" });
+			port.postMessage({ from: "swal" });
 		}
 	});
 });
@@ -327,7 +330,7 @@ function toggleVideos(visibility) {
 			const index = video.querySelector("div#index-container");
 			const indexClass = index.classList;
 
-			const noTag = true;
+			let noTag = true;
 
 			for (let aClass of indexClass) {
 				if (aClass.indexOf("courte-") != -1 || aClass.indexOf("longue-") != -1 || aClass.indexOf("creator-") != -1) {
@@ -372,6 +375,25 @@ function countCreatorOccurrences(videoArray = []) {
 //============================
 
 //=======SORT ELEMENTS========
+function getCreatorsList(videoArray = []) {
+	//console.log("--------------------------");
+
+	let creators = [];
+
+	if (videoArray.length === 0) {
+		console.log(`Erreur : la liste ne contient aucune video`);
+	} else {
+		const videoCreators = videoArray.map((video) => {
+			return video.creator;
+		});
+
+		creators = [...new Set(videoCreators)];
+	}
+	console.log("--------------------------");
+
+	return creators.sort(sortName);
+}
+
 function sortElementsByTime(videoArray = [], method = "increase") {
 	//console.log("--------------------------");
 	if (videoArray.length === 0) {

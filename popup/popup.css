@@ -196,3 +196,28 @@ footer {
 	margin: 0;
 	text-align: center;
 }
+
+/* Creator suggestions  */
+
+#creator-suggestions {
+	list-style: none;
+	border: 0 solid var(--second-color);
+	border-radius: 5px;
+	padding: 0;
+	margin: 0;
+	max-height: 100px;
+}
+
+#creator-suggestions li {
+	display: none;
+	font-size: 16px;
+	padding: 0.25em 0.5em;
+	text-transform: capitalize;
+	border-radius: 5px;
+}
+
+#creator-suggestions li:hover {
+	background-color: var(--action-color);
+	color: var(--white);
+	cursor: pointer;
+}
