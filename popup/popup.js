@@ -108,12 +108,12 @@ function showLoadingSwal() {
 }
 
 function swapVisibilityButton(visibility) {
-	if (visibility) {
-		hideButton.style.display = "block";
-		showButton.style.display = "none";
-	} else {
-		hideButton.style.display = "none";
+	if (visibility === "show") {
 		showButton.style.display = "block";
+		hideButton.style.display = "none";
+	} else {
+		showButton.style.display = "none";
+		hideButton.style.display = "block";
 	}
 }
 
@@ -244,7 +244,7 @@ async function init() {
 
 		creatorSwitch.checked = false;
 
-		swapVisibilityButton(true);
+		swapVisibilityButton("show");
 
 		showLoadingSwal();
 
@@ -260,7 +260,7 @@ async function init() {
 
 		creatorSwitch.checked = false;
 
-		swapVisibilityButton(true);
+		swapVisibilityButton("show");
 
 		showLoadingSwal();
 
@@ -289,7 +289,7 @@ async function init() {
 			return;
 		}
 
-		swapVisibilityButton(id === "show");
+		swapVisibilityButton(id);
 
 		showLoadingSwal();
 

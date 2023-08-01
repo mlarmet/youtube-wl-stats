@@ -55,9 +55,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 					else showVideoArrayStat(videoData);
 
 					chrome.storage.local.get("visibility", function (result) {
-						if (result?.visibility == false) {
-							toggleVideos(false);
-						}
+						toggleVideos(result?.visibility);
 					});
 					break;
 				case "time":
@@ -75,9 +73,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 					findByName(req.creator);
 
 					chrome.storage.local.get("visibility", function (result) {
-						if (result?.visibility == false) {
-							toggleVideos(false);
-						}
+						toggleVideos(result?.visibility);
 					});
 					break;
 				case "clear":
@@ -85,8 +81,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 					toggleVideos(true);
 					break;
 				case "view":
-					const visibility = req.toggle === "show";
-					toggleVideos(visibility);
+					toggleVideos(req.toggle);
 					break;
 				case "print":
 					const array = req.creator ? videoByCreator : videoData;
@@ -323,7 +318,7 @@ function toggleVideos(visibility) {
 
 	videoContainer.forEach((video) => {
 		//show all
-		if (visibility) {
+		if (visibility === "show") {
 			video.style.display = "";
 		} else {
 			//hide
