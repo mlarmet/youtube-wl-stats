@@ -85,7 +85,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 					break;
 				case "print":
 					const array = req.creator ? videoByCreator : videoData;
-					const sortedArray = videoArray.toSorted(sortTime);
+					const sortedArray = array.toSorted(sortTime);
 
 					console.log(array);
 					console.log(sortedArray);
