@@ -49,7 +49,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 					});
 
 					resizeObserver.observe(document.querySelector("ytd-app"));
-					break;
+					return;
 				case "minmax":
 					if (req.creator) showVideoArrayStat(videoByCreator);
 					else showVideoArrayStat(videoData);
@@ -78,7 +78,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 					break;
 				case "clear":
 					clearCssTag();
-					toggleVideos(true);
+					toggleVideos("show");
 					break;
 				case "view":
 					toggleVideos(req.toggle);
@@ -131,7 +131,7 @@ function processVideo() {
 	console.log("--------------------------\n\n\nYoutube WL Stats\n\n\n--------------------------");
 
 	clearCssTag();
-	toggleVideos(true);
+	toggleVideos("show");
 
 	videoData = [];
 

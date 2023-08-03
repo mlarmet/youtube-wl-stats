@@ -300,11 +300,11 @@ async function init() {
 	}
 
 	hideButton.addEventListener("click", () => {
-		sendView("hide");
+		sendView("show");
 	});
 
 	showButton.addEventListener("click", () => {
-		sendView("show");
+		sendView("hide");
 	});
 
 	creatorInput.addEventListener("input", () => {
