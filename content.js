@@ -24,17 +24,29 @@ chrome.storage.sync.get("colors", function (data) {
 chrome.runtime.onConnect.addListener(function (port) {
 	port.onMessage.addListener(function (req) {
 		if (port.name === "mlarmet") {
+			const span = document.querySelector(".metadata-stats span");
+
 			switch (req.call) {
 				case "load":
+					if (span) {
+						numberOfVideos = parseInt(span.innerText);
+					}
+
 					processVideo();
 					port.postMessage({ from: "load" });
 					break;
 				case "loadAll":
+					if (span) {
+						numberOfVideos = parseInt(span.innerText);
+					}
+
 					const resizeObserver = new ResizeObserver((entries) => {
 						window.scrollTo(0, document.querySelector("ytd-app").clientHeight);
 
 						//if all video in playlist are show
-						if (numberOfVideos == document.querySelectorAll("ytd-playlist-video-renderer").length) {
+						// if (numberOfVideos == document.querySelectorAll("ytd-playlist-video-renderer").length) {
+						const spinner = document.querySelector("div.circle.style-scope.tp-yt-paper-spinner");
+						if (spinner === null) {
 							resizeObserver.disconnect();
 
 							window.scrollTo(0, 0);
