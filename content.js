@@ -119,25 +119,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 	});
 });
 
-window.addEventListener("load", () => {
-	const mutationObserver = new MutationObserver(() => {
-		const span = document.querySelector(".metadata-stats span");
-		//document.querySelector("div#stats yt-formatted-string span");
-
-		if (span) {
-			setTimeout(() => {
-				numberOfVideos = parseInt(span.innerText);
-			}, 500);
-
-			// showVideoArrayStat(videoData);
-			mutationObserver.disconnect();
-		}
-	});
-
-	const elementToWatch = document.body;
-	mutationObserver.observe(elementToWatch, { childList: true });
-});
-
 function processVideo() {
 	console.clear();
 	console.log("--------------------------\n\n\nYoutube WL Stats\n\n\n--------------------------");
@@ -151,17 +132,22 @@ function processVideo() {
 
 	const videoElements = document.querySelectorAll("ytd-playlist-video-renderer");
 
-	Array.from(videoElements).every((video) => {
+	Array.from(videoElements).forEach((video) => {
 		const videoTitle = video.querySelector("div#meta a#video-title");
 		const videoCreator = video.querySelector("ytd-channel-name a");
 		const videoTime = video.querySelector("ytd-thumbnail-overlay-time-status-renderer span#text");
 		const videoProgress = video.querySelector("div#progress");
 		const videoArriaLabel = video.querySelector("div#meta h3");
 
+		if (!videoTitle || !videoCreator || !videoTime || !videoArriaLabel) {
+			console.log("Error with", video);
+			return;
+		}
+
 		let idx = parseInt(videoTitle.href.split("&")[2].replace("index=", ""));
 		let titre = videoTitle.innerText;
 		let youtuber = videoCreator.innerText;
-		let time = videoTime?.innerText.trim().replace(",", ":");
+		let time = videoTime.innerText.trim().replace(",", ":");
 
 		let label = removeAccents(videoArriaLabel.getAttribute("aria-label"));
 		let motif = " de " + removeAccents(youtuber) + " il y a ";
@@ -188,8 +174,6 @@ function processVideo() {
 
 		const data = { duration: time, creator: youtuber, title: titre, sortie: release, index: idx, state: { watch: watched, end: ended }, element: video };
 		videoData.push(data);
-
-		return true;
 	});
 
 	const suffix = videoData.length > 1 ? "s" : "";
