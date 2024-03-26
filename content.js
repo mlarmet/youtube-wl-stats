@@ -91,9 +91,13 @@ chrome.runtime.onConnect.addListener(function (port) {
 				case "clear":
 					clearCssTag();
 					toggleVideos("show");
+					scrollToLimit("top");
 					break;
 				case "view":
 					toggleVideos(req.toggle);
+					break;
+				case "scroll":
+					scrollToLimit(req.to);
 					break;
 				case "print":
 					const array = req.creator ? videoByCreator : videoData;
@@ -335,6 +339,19 @@ function toggleVideos(visibility) {
 	});
 
 	chrome.storage.local.set({ visibility: visibility });
+}
+//============================
+
+//=======SCROLL TO============
+function scrollToLimit(to) {
+	if (to === "top") {
+		window.scrollTo(0, 0);
+	} else {
+		const ytpApp = document.querySelector("ytd-app");
+		if (ytpApp) {
+			window.scrollTo(0, ytpApp.clientHeight);
+		}
+	}
 }
 //============================
 

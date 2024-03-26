@@ -56,7 +56,8 @@ main {
 	padding: 0.5rem 1em;
 }
 
-#hide {
+#hide,
+#scrollTop {
 	display: none;
 }
 

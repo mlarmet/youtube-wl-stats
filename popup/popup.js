@@ -5,6 +5,9 @@ const data = document.querySelector("#data");
 const hideButton = document.querySelector("#hide");
 const showButton = document.querySelector("#show");
 
+const scrollTop = document.querySelector("#scrollTop");
+const scrollDown = document.querySelector("#scrollDown");
+
 const actions = document.querySelector("#actions");
 
 const arrowDecrease = document.querySelector("#arrow-decrease");
@@ -114,6 +117,16 @@ function swapVisibilityButton(visibility) {
 	} else {
 		showButton.style.display = "none";
 		hideButton.style.display = "block";
+	}
+}
+
+function swapScrollButton(scroll) {
+	if (scroll === "top") {
+		scrollTop.style.display = "block";
+		scrollDown.style.display = "none";
+	} else {
+		scrollTop.style.display = "none";
+		scrollDown.style.display = "block";
 	}
 }
 
@@ -245,6 +258,7 @@ async function init() {
 		creatorSwitch.checked = false;
 
 		swapVisibilityButton("show");
+		swapScrollButton("down");
 
 		showLoadingSwal();
 
@@ -261,6 +275,7 @@ async function init() {
 		creatorSwitch.checked = false;
 
 		swapVisibilityButton("show");
+		swapScrollButton("down");
 
 		showLoadingSwal();
 
@@ -299,12 +314,35 @@ async function init() {
 		});
 	}
 
+	function scrollToLimit(id) {
+		if (!connected) {
+			return;
+		}
+
+		swapScrollButton(id);
+
+		showLoadingSwal();
+
+		port.postMessage({
+			call: "scroll",
+			to: id,
+		});
+	}
+
 	hideButton.addEventListener("click", () => {
 		sendView("show");
 	});
 
 	showButton.addEventListener("click", () => {
 		sendView("hide");
+	});
+
+	scrollTop.addEventListener("click", () => {
+		scrollToLimit("down");
+	});
+
+	scrollDown.addEventListener("click", () => {
+		scrollToLimit("top");
 	});
 
 	creatorInput.addEventListener("input", () => {
