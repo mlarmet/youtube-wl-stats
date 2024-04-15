@@ -8,14 +8,21 @@ const creatorLongest = document.querySelector("#creator-longest");
 const saveButton = document.querySelector("#save");
 const resetButton = document.querySelector("#reset");
 
-function setDefaultColors() {
-	globalShortest.value = "#008000";
-	globalLongest.value = "#ff0000";
+const DEFAULT_SHORTEST = "#008000";
+const DEFAULT_LONGEST = "#ff0000";
 
-	creatorColor.value = "#0000ff";
-	creatorShortest.value = "#9acd32";
-	creatorLongest.value = "#ff6347";
-}
+const DEFAULT_CREATOR_COLOR = "#0000ff";
+const DEFAULT_CREATOR_SHORTEST = "#9acd32";
+const DEFAULT_CREATOR_LONGEST = "#ff6347";
+
+const setDefaultColors = () => {
+	globalShortest.value = DEFAULT_SHORTEST;
+	globalLongest.value = DEFAULT_LONGEST;
+
+	creatorColor.value = DEFAULT_CREATOR_COLOR;
+	creatorShortest.value = DEFAULT_CREATOR_SHORTEST;
+	creatorLongest.value = DEFAULT_CREATOR_LONGEST;
+};
 
 window.addEventListener("load", () => {
 	chrome.storage.sync.get("colors", function (data) {
@@ -33,20 +40,18 @@ window.addEventListener("load", () => {
 		saveButton.disabled = true;
 
 		//if colors in storage are defaults ones
-		if (globalShortest.value == "#008000" && globalLongest.value == "#ff0000" && creatorColor.value == "#0000ff" && creatorShortest.value == "#9acd32" && creatorLongest.value == "#ff6347") {
+		if (
+			globalShortest.value == DEFAULT_SHORTEST &&
+			globalLongest.value == DEFAULT_LONGEST &&
+			creatorColor.value == DEFAULT_CREATOR_COLOR &&
+			creatorShortest.value == DEFAULT_CREATOR_SHORTEST &&
+			creatorLongest.value == DEFAULT_CREATOR_LONGEST
+		) {
 			//disable reset button
 			resetButton.disabled = true;
 		}
 	});
 });
-
-// window.addEventListener("beforeunload", (e) => {
-// 	//save button not disable mean colors changes not saved
-// 	if (saveButton.getAttribute("disabled") == null) {
-// 		//swal alert
-// 		return confirm("Nouvelles couleurs non enregitrées");
-// 	}
-// });
 
 saveButton.addEventListener("click", (e) => {
 	const globalShortestValue = globalShortest.value;
@@ -88,12 +93,12 @@ resetButton.addEventListener("click", (e) => {
 	resetButton.disabled = true;
 
 	chrome.storage.sync.get("colors", function (data) {
-		let gs = data.colors[0];
-		let gl = data.colors[1];
+		const gs = data.colors[0];
+		const gl = data.colors[1];
 
-		let cc = data.colors[2];
-		let cs = data.colors[3];
-		let cl = data.colors[4];
+		const cc = data.colors[2];
+		const cs = data.colors[3];
+		const cl = data.colors[4];
 
 		//if color on reset are same as load
 		if (globalShortest.value == gs && globalLongest.value == gl && creatorColor.value == cc && creatorShortest.value == cs && creatorLongest.value == cl) {
