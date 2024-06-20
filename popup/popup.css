@@ -67,6 +67,7 @@ main {
 	width: 25px;
 	transition: transform 400ms;
 }
+
 .icon path {
 	pointer-events: none;
 }
@@ -75,6 +76,7 @@ main {
 	fill: var(--action-color);
 	transform: rotate(360deg);
 }
+
 /* .icon:nth-child(2n-1):not(#show):not(#hide) {
 	margin: 0 1rem;
 } */

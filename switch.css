@@ -3,6 +3,7 @@ input[type="checkbox"] {
 	height: 0;
 	visibility: hidden;
 }
+
 label {
 	width: 40px;
 	height: 20px;
@@ -14,6 +15,7 @@ label {
 	transition: 0.5s;
 	/* box-shadow: 0 0 20px #477a8550; */
 }
+
 label::after {
 	content: "";
 	width: 12.5px;
@@ -26,16 +28,16 @@ label::after {
 	transition: 0.5s;
 }
 
-input:checked + label:after {
+input:checked+label:after {
 	left: calc(100% - 5px);
 	transform: translateX(-100%);
 }
 
-input:checked + label {
+input:checked+label {
 	background-color: var(--action-color);
 }
 
-input:disabled + label {
+input:disabled+label {
 	filter: brightness(0.5);
 	cursor: not-allowed;
 }

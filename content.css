@@ -6,9 +6,11 @@
 	--creator-shortest: yellowgreen;
 	--creator-longest: tomato;
 }
+
 .courte-video {
 	background-color: var(--global-shortest);
 }
+
 .longue-video {
 	background-color: var(--global-longest);
 }
@@ -20,6 +22,7 @@
 .courte-creator-video {
 	background-color: var(--creator-shortest) !important;
 }
+
 .longue-creator-video {
 	background-color: var(--creator-longest) !important;
 }
@@ -27,6 +30,7 @@
 .courte-video.courte-creator-video {
 	box-shadow: 0 0 0 4px var(--global-shortest) inset;
 }
+
 .longue-video.longue-creator-video {
 	box-shadow: 0 0 0 4px var(--global-longest) inset;
 }

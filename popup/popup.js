@@ -198,8 +198,8 @@ async function init() {
 	playlistLink.style.display = "none";
 
 	//====================== PORT =======================
-	let queryOptions = { url: "https://www.youtube.com/playlist?list=WL" };
-	let tabs = await chrome.tabs.query(queryOptions);
+	const queryOptions = { url: "https://www.youtube.com/playlist?list=WL" };
+	const tabs = await chrome.tabs.query(queryOptions);
 
 	//not tab found
 	if (tabs.length == 0) {

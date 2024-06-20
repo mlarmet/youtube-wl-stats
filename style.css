@@ -61,9 +61,11 @@ input {
 .swal2-icon {
 	font-size: 0.75rem !important;
 }
+
 .swal2-title {
 	font-size: 1.5rem !important;
 }
+
 .swal2-loader {
 	border-color: var(--action-color) transparent var(--action-color) transparent !important;
 }
