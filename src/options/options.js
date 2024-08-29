@@ -41,11 +41,11 @@ window.addEventListener("load", () => {
 
 		//if colors in storage are defaults ones
 		if (
-			globalShortest.value == DEFAULT_SHORTEST &&
-			globalLongest.value == DEFAULT_LONGEST &&
-			creatorColor.value == DEFAULT_CREATOR_COLOR &&
-			creatorShortest.value == DEFAULT_CREATOR_SHORTEST &&
-			creatorLongest.value == DEFAULT_CREATOR_LONGEST
+			globalShortest.value === DEFAULT_SHORTEST &&
+			globalLongest.value === DEFAULT_LONGEST &&
+			creatorColor.value === DEFAULT_CREATOR_COLOR &&
+			creatorShortest.value === DEFAULT_CREATOR_SHORTEST &&
+			creatorLongest.value === DEFAULT_CREATOR_LONGEST
 		) {
 			//disable reset button
 			resetButton.disabled = true;
@@ -53,7 +53,7 @@ window.addEventListener("load", () => {
 	});
 });
 
-saveButton.addEventListener("click", (e) => {
+saveButton.addEventListener("click", () => {
 	const globalShortestValue = globalShortest.value;
 	const globalLongestValue = globalLongest.value;
 
@@ -61,7 +61,7 @@ saveButton.addEventListener("click", (e) => {
 	const creatorShortestValue = creatorShortest.value;
 	const creatorLongestValue = creatorLongest.value;
 
-	chrome.storage.sync.set({ colors: [globalShortestValue, globalLongestValue, creatorColorValue, creatorShortestValue, creatorLongestValue] }, (e) => {
+	chrome.storage.sync.set({ colors: [globalShortestValue, globalLongestValue, creatorColorValue, creatorShortestValue, creatorLongestValue] }, () => {
 		Swal.fire({
 			icon: "success",
 			title: "Options enregistrées !",
@@ -78,16 +78,14 @@ saveButton.addEventListener("click", (e) => {
 		saveButton.disabled = true;
 	});
 });
-
-let colorsChanged = false;
 document.querySelectorAll(".picker").forEach((colorPicker) => {
-	colorPicker.addEventListener("change", (e) => {
+	colorPicker.addEventListener("change", () => {
 		saveButton.disabled = false;
 		resetButton.disabled = false;
 	});
 });
 
-resetButton.addEventListener("click", (e) => {
+resetButton.addEventListener("click", () => {
 	setDefaultColors();
 
 	resetButton.disabled = true;
@@ -101,10 +99,11 @@ resetButton.addEventListener("click", (e) => {
 		const cl = data.colors[4];
 
 		//if color on reset are same as load
-		if (globalShortest.value == gs && globalLongest.value == gl && creatorColor.value == cc && creatorShortest.value == cs && creatorLongest.value == cl) {
-			saveButton.disabled = true;
-		} else {
-			saveButton.disabled = false;
-		}
+		saveButton.disabled =
+			globalShortest.value === gs &&
+			globalLongest.value === gl &&
+			creatorColor.value === cc &&
+			creatorShortest.value === cs &&
+			creatorLongest.value === cl;
 	});
 });

@@ -40,7 +40,7 @@ main {
 	flex-direction: column;
 	position: relative;
 	flex: 1;
-	background-color: var(--main-color);
+	/*background-color: var(--main-color);*/
 	background-color: var(--second-color);
 	color: var(--white);
 	/* background-image: radial-gradient(circle, #003459, #002d4a, #00263b, #001e2c 70%, #00171f); */
@@ -92,7 +92,7 @@ main {
 }
 
 .box {
-	background-color: var(--second-color);
+	/*background-color: var(--second-color);*/
 	background-color: var(--main-color);
 	border-radius: 5px;
 }

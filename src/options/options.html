@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="author" content="Maxence LARMET" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap"
+		rel="stylesheet">
+
+	<link rel="stylesheet" href="../style.css" />
+	<link rel="stylesheet" href="options.css" />
+
+
+	<title>Youtube Watch Later</title>
+</head>
+
+<body>
+	<div id="content">
+
+		<header>
+			<!-- <h2 class="title">Options Youtube WL Stats</h2> -->
+			<p>Définitions des couleurs des vidéos</p>
+		</header>
+		<main>
+			<div id="global-list" class="list">
+				<h3 class="title">Liste entière :</h3>
+				<div class="form-row">
+					<div class="from-color">
+						<input type="color" name="global-shortest" id="global-shortest" class="picker">
+						<label for="global-shortest">Video courte</label>
+					</div>
+					<hr />
+					<div class="from-color">
+						<input type="color" name="global-longest" id="global-longest" class="picker">
+						<label for="global-longest">Video longue</label>
+					</div>
+				</div>
+			</div>
+
+			<div id="creator-list" class="list">
+				<h3 class="title">Liste d'un créateur :</h3>
+				<div class="form-row">
+					<div class="from-color">
+						<input type="color" name="creator-color" id="creator-color" class="picker">
+						<label for="creator-color">Video createur</label>
+					</div>
+					<hr />
+
+					<div class="from-color">
+						<input type="color" name="creator-shortest" id="creator-shortest" class="picker">
+						<label for="creator-shortest">Video courte</label>
+					</div>
+					<hr />
+
+					<div class="from-color">
+						<input type="color" name="creator-longest" id="creator-longest" class="picker">
+						<label for="creator-longest">Video longue</label>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<footer>
+			<button id="save" type="submit">Enregistrer</button>
+			<button id="reset" type="reset">Reset</button>
+		</footer>
+
+	</div>
+
+	<script src="../lib/sweetalert2@11.js" type="text/javascript"></script>
+	<script src="./options.js" type="text/javascript"></script>
+</body>
+
+</html>

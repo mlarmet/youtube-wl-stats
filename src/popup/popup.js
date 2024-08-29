@@ -20,7 +20,7 @@ const creatorSuggestions = document.getElementById("creator-suggestions");
 
 let creatorList = [];
 
-creatorInput.addEventListener("input", (e) => {
+creatorInput.addEventListener("input", () => {
 	const nameContent = creatorInput.value;
 
 	filterSuggestions(nameContent);
@@ -70,7 +70,7 @@ function setCreatorList(list) {
 		liElem.id = name.replace(/ /g, "-");
 		liElem.style.display = "none";
 
-		liElem.addEventListener("click", (e) => {
+		liElem.addEventListener("click", () => {
 			setCreator(name);
 		});
 
@@ -100,7 +100,7 @@ function showLoadingSwal() {
 		showConfirmButton: false,
 		allowEscapeKey: false,
 		allowOutsideClick: false,
-		timer: 20000, //secure if load all failed
+		timer: 25000, //secure if load all failed
 		didOpen: () => {
 			Swal.showLoading();
 		},
@@ -151,16 +151,12 @@ function showVideoLoad() {
 			});
 		} else {
 			data.style.display = "none";
-			//setDisplayText("Chargement...");
 
 			showLoadingSwal();
 
 			port?.postMessage({
 				call: "loadAll",
 			});
-
-			// setDisplayText("Erreur lors de la récupération");
-			// data.style.display = "none";
 		}
 	});
 
@@ -194,7 +190,7 @@ document.querySelector("#option").addEventListener("click", function () {
 let port = null;
 let connected = true;
 
-async function init() {
+(async function init() {
 	playlistLink.style.display = "none";
 
 	//====================== PORT =======================
@@ -202,7 +198,7 @@ async function init() {
 	const tabs = await chrome.tabs.query(queryOptions);
 
 	//not tab found
-	if (tabs.length == 0) {
+	if (tabs.length === 0) {
 		setDisplayText("Aucun onglet valide ouvert");
 		playlistLink.style.display = "block";
 		data.style.display = "none";
@@ -346,22 +342,20 @@ async function init() {
 	});
 
 	creatorInput.addEventListener("input", () => {
-		let name = creatorInput.value;
-		//name incorrect
-		if (!name.trim()) {
-			// creatorButton.disabled = true;
+		const name = creatorInput.value;
 
+		// name incorrect
+		if (!name.trim()) {
 			creatorSwitch.disabled = true;
 			creatorSwitch.checked = false;
 		} else {
-			// creatorButton.disabled = false;
 			creatorSwitch.disabled = false;
 		}
 
 		chrome.storage.local.set({ name: name });
 	});
 
-	creatorSwitch.addEventListener("change", (e) => {
+	creatorSwitch.addEventListener("change", () => {
 		if (!creatorSwitch.checked || !connected) {
 			return;
 		}
@@ -377,7 +371,7 @@ async function init() {
 	});
 
 	actions.querySelectorAll("button").forEach((button) => {
-		button.addEventListener("click", (e) => {
+		button.addEventListener("click", () => {
 			if (!connected) {
 				return;
 			}
@@ -407,6 +401,4 @@ async function init() {
 	//===================================================
 
 	showVideoLoad();
-}
-
-init();
+})();
